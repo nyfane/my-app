@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    tools{
+        maven 'M2_HOME'
+    }
+    environment {
+        registry = '823008317281.dkr.ecr.us-west-2.amazonaws.com/myjob'
+        dockerimage = ''
+
+    }
+    stages {
+        stage('Checkout'){
+            steps{
+                git branch: 'main', url: 'https://github.com/nyfane/my-app.git'
+            }
+        }
+        stage('Code Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        // Build Docker images
+        stage ('build image') {
+            steps {
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+                
+            }
+        }
+        // Upload Docker images into AWS ECR
+        stage ('') {
+           steps {
+            sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 823008317281.dkr.ecr.us-west-2.amazonaws.com'
+            sh 'docker build -t myjob .'
+            sh 'docker tag myjob:latest 823008317281.dkr.ecr.us-west-2.amazonaws.com/myjob:latest'
+            sh 'docker push 823008317281.dkr.ecr.us-west-2.amazonaws.com/myjob:latest'
+           } 
+        }
+
+    }
+}
