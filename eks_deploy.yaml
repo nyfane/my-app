@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  minReadySeconds: 10
+  strategy: 
+    type: RollingUpdate 
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: myapp 
+    spec:
+      containers:
+      - name: myApp 
+        image: 823008317281.dkr.ecr.us-west-2.amazonaws.com/myjob:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: myapp 
+    k8s-app: myapp
+  name: myapp 
+spec:
+  selector:
+    app: myapp
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8082
+  type: LoadBalancer
