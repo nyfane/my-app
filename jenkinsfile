@@ -46,9 +46,9 @@ pipeline {
         // Deploy to EKS cluster
         stage ('Deploy to EKS') {
           steps {
-            withKubeConfig(caCertificate: '', clusterName: ' ', contextName: '', credentialsId: 'eks_credential', namespace: '', serverUrl: '') {
-    // some block
-             sh "kubectl create -f eks_deploy.yaml"
+          script {
+                    eks_deploy(configs: 'eks_deploy.yaml', credentialsId: 'eks-credentials' )
+                }
             }
           }
         }
