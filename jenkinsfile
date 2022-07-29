@@ -5,6 +5,7 @@ pipeline {
     }
     environment {
         registry = '823008317281.dkr.ecr.us-west-2.amazonaws.com/myjob'
+        registrycredential = 'eks-credential'
         dockerimage = ''
 
     }
